@@ -6,7 +6,7 @@
             <name>Kanav_433</name>
             <creation-uuid>f0cd2aa8-2acc-4113-bf88-36c9b25a38ac</creation-uuid>
             <make-project-type>0</make-project-type>
-            <c-extensions/>
+            <c-extensions>c</c-extensions>
             <cpp-extensions/>
             <header-extensions/>
             <asminc-extensions/>

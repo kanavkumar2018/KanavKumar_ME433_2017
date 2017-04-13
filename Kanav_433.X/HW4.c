@@ -59,10 +59,6 @@ int main() {
 
     // disable JTAG to get pins back
     DDPCONbits.JTAGEN = 0;
-
-    // do your TRIS and LAT commands here
-    // SPI Pin initializations
-    TRISAbits.TRISA1 = 0;   // A1 is SDO1 pin
     
     initSPI1();
     
@@ -75,7 +71,7 @@ int main() {
     for (i=0;i<100;i++)    {
         temp = 255.0/2.0 + 255.0/2.0*sin(2.0*M_PI*i/100.0);
         sinewave[i] = temp;
-        temp = i+255.0/100.0;
+        temp = 2.5*(i+225.0/100.0);
         rampwave[i] = temp;
     }
     
