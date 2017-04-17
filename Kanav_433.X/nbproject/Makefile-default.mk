@@ -51,17 +51,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=HW4.c i2c2.c
+SOURCEFILES_QUOTED_IF_SPACED=HW4.c i2c2.c HW5.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/HW4.o ${OBJECTDIR}/i2c2.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/HW4.o.d ${OBJECTDIR}/i2c2.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/HW4.o ${OBJECTDIR}/i2c2.o ${OBJECTDIR}/HW5.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/HW4.o.d ${OBJECTDIR}/i2c2.o.d ${OBJECTDIR}/HW5.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/HW4.o ${OBJECTDIR}/i2c2.o
+OBJECTFILES=${OBJECTDIR}/HW4.o ${OBJECTDIR}/i2c2.o ${OBJECTDIR}/HW5.o
 
 # Source Files
-SOURCEFILES=HW4.c i2c2.c
+SOURCEFILES=HW4.c i2c2.c HW5.c
 
 
 CFLAGS=
@@ -112,6 +112,12 @@ ${OBJECTDIR}/i2c2.o: i2c2.c  nbproject/Makefile-${CND_CONF}.mk
 	@${RM} ${OBJECTDIR}/i2c2.o 
 	@${FIXDEPS} "${OBJECTDIR}/i2c2.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/i2c2.o.d" -o ${OBJECTDIR}/i2c2.o i2c2.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD) 
 	
+${OBJECTDIR}/HW5.o: HW5.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/HW5.o.d 
+	@${RM} ${OBJECTDIR}/HW5.o 
+	@${FIXDEPS} "${OBJECTDIR}/HW5.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/HW5.o.d" -o ${OBJECTDIR}/HW5.o HW5.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD) 
+	
 else
 ${OBJECTDIR}/HW4.o: HW4.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
@@ -124,6 +130,12 @@ ${OBJECTDIR}/i2c2.o: i2c2.c  nbproject/Makefile-${CND_CONF}.mk
 	@${RM} ${OBJECTDIR}/i2c2.o.d 
 	@${RM} ${OBJECTDIR}/i2c2.o 
 	@${FIXDEPS} "${OBJECTDIR}/i2c2.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/i2c2.o.d" -o ${OBJECTDIR}/i2c2.o i2c2.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD) 
+	
+${OBJECTDIR}/HW5.o: HW5.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/HW5.o.d 
+	@${RM} ${OBJECTDIR}/HW5.o 
+	@${FIXDEPS} "${OBJECTDIR}/HW5.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/HW5.o.d" -o ${OBJECTDIR}/HW5.o HW5.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD) 
 	
 endif
 
