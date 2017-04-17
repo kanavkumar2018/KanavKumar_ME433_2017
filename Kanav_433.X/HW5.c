@@ -98,6 +98,8 @@ void init_expander()    {
     i2c_master_send(0x6);   // pullups
     i2c_master_send(0b00001111);
     i2c_master_stop;
+    
+    
 }
 
 unsigned char get_expander()    {
