@@ -1,14 +1,7 @@
-/* 
- * File:   HW5.c
- * Author: kanavkumar
- *
- * Created on April 17, 2017, 2:17 PM
- */
-
 #include<xc.h>           // processor SFR definitions
 #include<sys/attribs.h>  // __ISR macro
 #include<stdio.h>
-#include<i2c2.h>
+#include "i2c2.h"
 
 // DEVCFG0
 #pragma config DEBUG = OFF // no debugging
@@ -47,11 +40,11 @@
 
 // Definitions
 #define CLOCK 48000000
-#define SLAVE_ADDR 0b0100000
+#define SLAVE_ADDR 0b01000000       // last bit: 0 for write, default state
 
 void init_expander(void);
 unsigned char get_expander(void);
-void set_expander(unsigned char);
+void set_expander(unsigned char pin, unsigned char value);
 
 int main() {
     __builtin_disable_interrupts();
@@ -68,63 +61,77 @@ int main() {
     // disable JTAG to get pins back
     DDPCONbits.JTAGEN = 0;
     
-    unsigned char pins = 0;
+    init_expander();
+    
+    unsigned char pin_values;
     
     while(1)    {
-        _CP0_SET_COUNT(0);
-        while(_CP0_GET_COUNT() < CLOCK/2/1000)  {;}
         
-        pins = get_expander();
-        if(pins&1 == 0b1)   {
-            set_expander(0);
-            // LATAbits.LATA4 = 1
+        pin_values = get_expander();
+        
+        if  ((pin_values >> 7) == 1)   {  // if GP7 is HIGH
+            set_expander(0, 1);     // outputs GP0 as HIGH
         }
         else    {
-            set_expander(1);
-            // LATAbits.LATA4 = 0
+            set_expander(0, 0);     // outputs GP0 as LOW
         }
     }
 }
 
-void init_expander()    {
-    i2c_master_start();
-    i2c_master_send(SLAVE_ADDR << 1 | 0);
-    i2c_master_send(0); // io
-    i2c_master_send(0b00001111);
-    i2c_master_stop();
+void init_expander(void)    {
+    ANSELBbits.ANSB2 = 0;       // turn of analog on B2 and B3
+    ANSELBbits.ANSB3 = 0;       // SDA2 (B2) and SCL2 (B3))
     
-    i2c_master_start();
-    i2c_master_send(SLAVE_ADDR << 1| 0);
-    i2c_master_send(0x6);   // pullups
-    i2c_master_send(0b00001111);
-    i2c_master_stop;
+    i2c2_master_setup();
     
+    i2c2_master_start();
+    i2c2_master_send(SLAVE_ADDR);       // address is set to write on default
+    i2c2_master_send(0x0);              // access IODIR
+    i2c2_master_send(0b11110000);       // GP7:GP4 = inputs, GP3:GP0 = outputs
+    i2c2_master_stop();                 // stops communication
     
+    i2c2_master_start();
+    i2c2_master_send(SLAVE_ADDR);       // address is set to write on default
+    i2c2_master_send(0x6);              // access GPPU (pullup resistors)
+    i2c2_master_send(0b10000000);       // GP7 pullup (for pushbutton)
+    i2c2_master_stop();
+    
+    i2c2_master_start();
+    i2c2_master_send(SLAVE_ADDR);       // address is set to write on default
+    i2c2_master_send(0x9);              // access GPIO (output)
+    i2c2_master_send(0b00000001);       // sets GP7:GP1 as LOW, GP0 (LED) as HIGH
+    i2c2_master_stop();
 }
 
-unsigned char get_expander()    {
-    i2c_master_start();
-    i2c_master_send(SLAVE_ADDR << 1| 0);
-    i2c_master_send(0x9);
-    i2c_master_restart();
-    i2c_master_send(SLAVE_ADDR << 1 | 1);
+unsigned char get_expander(void)    {
+    unsigned char val;
     
-    unsigned char a = i2c_master_recv();
-    i2c_master_ack(1);
-    i2c_master_stop();
+    i2c2_master_start();
+    i2c2_master_send(SLAVE_ADDR);       // address is set to write on default
+    i2c2_master_send(0x9);              // access GPIO
+    i2c2_master_restart();              // restarts I2C before reading
+    i2c2_master_send(SLAVE_ADDR | 1);   // 1 = read
     
-    return a;
+    val = i2c2_master_recv();
+    i2c2_master_ack(1);                 // stops requesting data from MCP23008
+    i2c2_master_stop();                 // stops I2C
+    
+    return val;                         // returns 8-bit info with pin values
 }
 
-void set_expander(unsigned char value)  {
-    i2c_master_start();
-    i2c_master_send(SLAVE_ADDR << 1 | 0);
-    i2c_master_send(0x9);
+void set_expander(unsigned char pin, unsigned char value)  {
+    unsigned char val_set = get_expander();
     
     if (value == 0) {
-        i2c_master_send(0);
+        val_set = (val_set | (1 << pin)); // AND with NOT 1 shifted by "pin", sets 0
     }
     else    {
-        i2c_master_send(1);
+        val_set = (val_set & ~ (1 << pin)); // OR with 1 shifted by "pin", sets 1
     }
+    
+    i2c2_master_start();
+    i2c2_master_send(SLAVE_ADDR);       // address is set to write on default
+    i2c2_master_send(0x9);              // access GPIO
+    i2c2_master_send(val_set);          // sets as 8-bit val_set
+    i2c2_master_stop();
 }
