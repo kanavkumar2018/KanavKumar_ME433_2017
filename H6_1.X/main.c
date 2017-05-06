@@ -84,7 +84,7 @@ int main() {
     while(1)    {
         _CP0_SET_COUNT(0);
         sprintf(num, "Bar Length: %d   ", (i-50));
-        LCD_writeString(num, 24, 42, TEXT, BCKGRND);
+        LCD_writeString(num, 24, 44, TEXT, BCKGRND);
         LCD_writeBar(64, 57, TEXT, 1, 5);           // draws center bar
         if (i < 50)  {
             LCD_writeBar(14+i, 57, TEXT, (50-i), 5);    // draws bar color TEXT
@@ -99,7 +99,10 @@ int main() {
             i = 0;
             LCD_writeBar(64, 57, BCKGRND, 50, 5);       // clears bar on the right
         }
-
+        
+        fps_count = (CLOCK/2) / _CP0_GET_COUNT();
+        sprintf(fps, "FPS:  %d   ", fps_count);
+        LCD_writeString(fps, 44, 70, TEXT, BCKGRND);
         
     }
 }
