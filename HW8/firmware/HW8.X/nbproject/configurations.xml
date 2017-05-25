@@ -19,6 +19,9 @@
           </logicalFolder>
         </logicalFolder>
         <itemPath>../src/app.h</itemPath>
+        <itemPath>../../../HW7.X/i2c_master_noint.h</itemPath>
+        <itemPath>../../../HW7.X/ILI9163C.h</itemPath>
+        <itemPath>../../../HW7.X/IMU.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="framework" projectFiles="true">
         <logicalFolder name="f1" displayName="gfx" projectFiles="true">
@@ -96,6 +99,9 @@
         </logicalFolder>
         <itemPath>../src/app.c</itemPath>
         <itemPath>../src/main.c</itemPath>
+        <itemPath>../../../HW7.X/i2c_master_noint.c</itemPath>
+        <itemPath>../../../HW7.X/ILI9163C.c</itemPath>
+        <itemPath>../../../HW7.X/IMU.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="framework" projectFiles="true">
         <logicalFolder name="f1" displayName="system" projectFiles="true">
@@ -119,6 +125,7 @@
     <Elem>../../../microchip/harmony/v1_09</Elem>
     <Elem>../src/default</Elem>
     <Elem>../src/system_config/default</Elem>
+    <Elem>../../../HW7.X</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
