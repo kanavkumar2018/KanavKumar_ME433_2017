@@ -80,8 +80,6 @@ unsigned char IMU_data[14];
 unsigned char value;
 signed short ACC_data[7]; // (temperature, gyroX, gyroY, gyroZ, accelX, accelY, accelZ))
 signed short barx, bary;
-
-
 // *****************************************************************************
 /* Application Data
   Summary:
