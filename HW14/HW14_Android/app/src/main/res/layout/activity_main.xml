@@ -43,38 +43,35 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="0dp" />
 
-        <ScrollView
-        android:id="@+id/ScrollView01"
-        android:layout_width="0dp"
-        android:layout_height="250dip"
-        tools:layout_editor_absoluteX="128dp"
-        tools:layout_editor_absoluteY="68dp">
-
-        <TextView
-            android:id="@+id/textView03"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@android:color/holo_green_light"
-            android:text="nothing from usb yet" />
-    </ScrollView>
-
-        <TextView
-            android:id="@+id/textView02"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="nothing from button yet"
-            tools:layout_editor_absoluteX="119dp"
-            tools:layout_editor_absoluteY="326dp" />
 
         <Button
             android:id="@+id/button1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingBottom="10dp"
-            android:paddingTop="10dp"
-            android:text="Send slider value"
-            tools:layout_editor_absoluteX="119dp"
-            tools:layout_editor_absoluteY="368dp" />
+            android:text="Send slider value" />
+
+        <TextView
+            android:id="@+id/textView02"
+            android:text="nothing from button yet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+
+        <ScrollView
+            android:id="@+id/ScrollView01"
+            android:layout_width="wrap_content"
+            android:layout_height="250dip">
+
+            <TextView
+                android:id="@+id/textView03"
+                android:text="nothing from usb yet"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/holo_green_light"
+                />
+        </ScrollView>
+
+
     </LinearLayout>
     <android.support.constraint.Guideline
         android:layout_width="wrap_content"
