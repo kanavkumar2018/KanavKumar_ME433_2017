@@ -69,6 +69,13 @@ signed short combined_data[7]; // [temp, x_g, y_g, z_g, x_xl, y_xl, z_xl]
 int j, k = 0;
 int startSample = 0;
 
+int gotRx = 0; // the flag
+int rxVal = 0; // a place to store the int that was received
+int rxVal2 = 0
+char rx[64]; // the raw data
+int rxPos = 0; // how much data has been stored
+
+
     
 unsigned char msg[100];
 
@@ -414,6 +421,7 @@ void APP_Tasks(void) {
                 break;
             }
             
+            
             /* If a read is complete, then schedule a read
              * else wait for the current read to complete */
 
@@ -426,13 +434,38 @@ void APP_Tasks(void) {
                         &appData.readTransferHandle, appData.readBuffer,
                         APP_READ_BUFFER_SIZE);
 
+                int ii = 0;
+                // loop thru the characters in the buffer
+                while (appData.readBuffer[ii] != 0) {
+                    // if you got a newline
+                    if (appData.readBuffer[ii] == '\n' || appData.readBuffer[ii] == '\r') {
+                        sscanf(rx, "%d %d", &rxVal,&rxVal2); // get the int out of the array
+                        LATAbits.LATA1 = 1; 
+                        OC1RS = rxVal; // velocity, 50
+                        LATBbits.LATB3 = 0; 
+                        OC4RS = rxVal2; 
+                        rx[rxPos] = 0; // end the array
+                        gotRx = 1; // set the flag
+                        break; // get out of the while loop
+                    } else if (appData.readBuffer[ii] == 0) {
+                        break; // there was no newline, get out of the while loop
+                    } else {
+                        // save the character into the array
+                        rx[rxPos] = appData.readBuffer[ii];
+                        rxPos++;
+                        ii++;
+                    }
+                }
+                
                 if (appData.readTransferHandle == USB_DEVICE_CDC_TRANSFER_HANDLE_INVALID) {
                     appData.state = APP_STATE_ERROR;
                     break;
                 }
+                
+                
             }
-
             break;
+                
 
         case APP_STATE_WAIT_FOR_READ_COMPLETE:
         case APP_STATE_CHECK_TIMER:
@@ -444,7 +477,7 @@ void APP_Tasks(void) {
             /* Check if a character was received or a switch was pressed.
              * The isReadComplete flag gets updated in the CDC event handler. */
 
-            if (appData.isReadComplete || _CP0_GET_COUNT() - startTime > (48000000/ 2 / 5)) {
+            if (gotRx || _CP0_GET_COUNT() - startTime > (48000000/ 2 / 5)) {
                 appData.state = APP_STATE_SCHEDULE_WRITE;
             }
 
@@ -461,14 +494,31 @@ void APP_Tasks(void) {
 
             appData.writeTransferHandle = USB_DEVICE_CDC_TRANSFER_HANDLE_INVALID;
             appData.isWriteComplete = false;
-            appData.state = APP_STATE_WAIT_FOR_WRITE_COMPLETE;
+            appData.state = APP_STATE_WAIT_FOR_WRITE_COMPLETE;            
             
-            len = sprintf(dataOut, "r\r\n");
-            
-            LATAbits.LATA1 = 1; // direction
-            OC1RS = 600; // velocity, 50%
-            LATBbits.LATB3 = 0; // direction
-            OC4RS = 600; // velocity, 50%
+             if (gotRx) {
+               
+                
+                len = 1;
+                dataOut[0] = 0;
+                i++;
+                USB_DEVICE_CDC_Write(USB_DEVICE_CDC_INDEX_0,
+                        &appData.writeTransferHandle,
+                        dataOut, len,
+                        USB_DEVICE_CDC_TRANSFER_FLAGS_DATA_COMPLETE);
+                rxPos = 0;
+                gotRx = 0;
+            } else {
+                
+                len = 1;
+                dataOut[0] = 0;
+                USB_DEVICE_CDC_Write(USB_DEVICE_CDC_INDEX_0,
+                        &appData.writeTransferHandle, dataOut, len,
+                        USB_DEVICE_CDC_TRANSFER_FLAGS_DATA_COMPLETE);
+                startTime = _CP0_GET_COUNT();
+            }
+             
+           
             
             break;
 
