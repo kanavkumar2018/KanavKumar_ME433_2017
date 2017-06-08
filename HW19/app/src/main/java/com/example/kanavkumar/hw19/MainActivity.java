@@ -59,17 +59,27 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
     private SerialInputOutputManager mSerialIoManager;
     SeekBar myControl;
     SeekBar myControl2;
+    SeekBar myControl3;
+
 
     TextView myTextView;
     TextView myTextView2;
+    TextView myTextView4;
+    TextView myTextView5;
+    TextView myTextView6;
+    TextView myTextView7;
+    TextView myTextView8;
+
 
     int range;
     int thresh;
+    int gain;
     int cent;
     int PWMright;
     int PWMleft;
-    int[] mass = new int[bmp.getHeight()/20];
     int counter;
+
+
 
     private final SerialInputOutputManager.Listener mListener =
             new SerialInputOutputManager.Listener() {
@@ -207,6 +217,8 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
 
         myControl = (SeekBar) findViewById(R.id.seek1);
         myControl2 = (SeekBar) findViewById(R.id.seek2);
+        myControl3 = (SeekBar) findViewById(R.id.seek3);
+
 
 
         myTextView = (TextView) findViewById(R.id.textView01);
@@ -214,6 +226,22 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
 
         myTextView2 = (TextView) findViewById(R.id.textView02);
         myTextView2.setText("Threshold");
+
+        myTextView4 = (TextView) findViewById(R.id.textView04);
+        myTextView4.setText("PWMleft");
+
+        myTextView5 = (TextView) findViewById(R.id.textView05);
+        myTextView5.setText("PWMright");
+
+        myTextView6 = (TextView) findViewById(R.id.textView06);
+        myTextView6.setText("Upper");
+
+        myTextView7 = (TextView) findViewById(R.id.textView07);
+        myTextView7.setText("Lower");
+
+        myTextView8 = (TextView) findViewById(R.id.textView08);
+        myTextView8.setText("Gain");
+
 
         setMyControlListener();
 
@@ -251,7 +279,7 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 progressChanged = progress;
                 thresh = progress;
-                myTextView.setText("Threshold is: "+ progress);
+                myTextView2.setText("Threshold is: "+ progress);
             }
 
             @Override
@@ -263,6 +291,28 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
 
             }
         });
+
+        myControl3.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+
+            int progressChanged = 0;
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                progressChanged = progress;
+                gain = progress;
+                myTextView8.setText("Gain is: "+ progress);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
     }
 
 
@@ -297,11 +347,13 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
     public void onSurfaceTextureUpdated(SurfaceTexture surface) {
         // every time there is a new Camera preview frame
         mTextureView.getBitmap(bmp);
+        int[] mass = new int[8];
 
         final Canvas c = mSurfaceHolder.lockCanvas();
+
         if (c != null) {
             int[] pixels = new int[bmp.getWidth()]; // pixels[] is the RGBA data
-            for (int j = 1; j < bmp.getHeight()/2; j = j + 10) {
+            for (int j = bmp.getHeight()/4; j < bmp.getHeight()*3/4; j = j + 30) {
                 int startY = j; // which row in the bitmap to analyze to read
                 bmp.getPixels(pixels, 0, bmp.getWidth(), 0, startY, bmp.getWidth(), 1);
 
@@ -309,6 +361,7 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
                 int sum_m = 0; // the sum of the masses
                 int R;
                 int T;
+
                 for (int i = 0; i < bmp.getWidth(); i++) {
                     R = range;
                     T = thresh;
@@ -336,8 +389,69 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
 
             }
 
+            counter = 0;
 
-            String sendString = Integer.toString(PWMleft) + " " + Integer.toString(PWMright) + '\n';
+            PWMleft = 660;
+            PWMright = 600;
+
+            int upper = 0;
+            int lower = 0;
+
+
+
+            int upperCount = 0;
+            int lowerCount = 0;
+
+
+            for (int j = 0; j < 3; j++){
+                upper = mass[j]+upper;
+                upperCount ++;
+            }
+
+            upper = upper/upperCount;
+
+            for (int kk = 4; kk < 7; kk++){
+                lower = mass[kk]+ lower;
+                lowerCount++;
+            }
+            lower = lower/lowerCount;
+
+
+            myTextView6.setText("Upper is: "+ upper);
+            myTextView7.setText("Lower is: "+ lower);
+
+
+            if (upper>lower){
+                PWMleft = 650 + ((upper-lower)*gain*100/(upper));
+                PWMright = 600 - ((upper-lower)*gain*100/(upper));
+            } else if (lower>upper){
+                PWMleft = 650 - ((lower-upper)*gain*100/(lower));
+                PWMright = 600 + ((lower-upper)*gain*100/(lower));
+            }
+
+
+
+
+
+
+            if (PWMright>1200){
+                PWMright = 1200;
+            }
+            if (PWMleft>1200){
+                PWMleft = 1200;
+            }
+            if (PWMright<100){
+                PWMright = 100;
+            }
+            if (PWMleft<100){
+                PWMleft = 100;
+            }
+
+            myTextView4.setText("PWMleft is: "+ PWMleft);
+            myTextView5.setText("PWMright is: "+ PWMright);
+
+
+            String sendString = Integer.toString(PWMright) + " " + Integer.toString(PWMleft) + '\n';
             try {
                 sPort.write(sendString.getBytes(), 10); // 10 is the timeout
             } catch (IOException e) { }

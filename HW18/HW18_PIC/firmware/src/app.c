@@ -71,11 +71,11 @@ int startSample = 0;
 
 int gotRx = 0; // the flag
 int rxVal = 0; // a place to store the int that was received
-int rxVal2 = 0
+int rxVal2 = 0;
 char rx[64]; // the raw data
 int rxPos = 0; // how much data has been stored
 
-
+int aa = 0;
     
 unsigned char msg[100];
 
@@ -373,6 +373,18 @@ void APP_Initialize(void) {
     OC1CONbits.ON = 1;
     OC4CONbits.ON = 1;
     
+     // put these initializations in APP_Initialize()
+    RPB9Rbits.RPB9R = 0b101; // B2 is OC4
+    T3CONbits.TCKPS = 4; // prescaler N=16
+    PR3 = 60000 - 1; // 50Hz
+    TMR3 = 0;
+    OC3CONbits.OCM = 0b110; // PWM mode without fault pin; other OC1CON bits are defaults
+    OC3CONbits.OCTSEL = 1; // use timer3
+    OC3RS = 4500; // should set the motor to 90 degrees (0.5ms to 2.5ms is 1500 to 7500 for 0 to 180 degrees)
+    OC3R = 4500; // read-only
+    T3CONbits.ON = 1;
+    OC3CONbits.ON = 1;
+    
     startTime = _CP0_GET_COUNT();
 }
 
@@ -491,6 +503,13 @@ void APP_Tasks(void) {
             }
 
             /* Setup the write */
+            
+            
+            if (aa>5000){
+                aa--;
+            } else if (aa<50){
+                aa++;
+            }
 
             appData.writeTransferHandle = USB_DEVICE_CDC_TRANSFER_HANDLE_INVALID;
             appData.isWriteComplete = false;
