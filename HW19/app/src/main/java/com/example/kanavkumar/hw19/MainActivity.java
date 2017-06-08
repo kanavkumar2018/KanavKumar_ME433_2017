@@ -81,6 +81,7 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
 
 
 
+
     private final SerialInputOutputManager.Listener mListener =
             new SerialInputOutputManager.Listener() {
                 @Override
@@ -348,13 +349,17 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
         // every time there is a new Camera preview frame
         mTextureView.getBitmap(bmp);
         int[] mass = new int[8];
+        int left;
+        int right;
+        int MAX_DUTY = 800;
+
 
         final Canvas c = mSurfaceHolder.lockCanvas();
 
         if (c != null) {
             int[] pixels = new int[bmp.getWidth()]; // pixels[] is the RGBA data
-            for (int j = bmp.getHeight()/4; j < bmp.getHeight()*3/4; j = j + 30) {
-                int startY = j; // which row in the bitmap to analyze to read
+            //for (int j = bmp.getHeight()/4; j < bmp.getHeight()*3/4; j = j + 30) {
+                int startY = bmp.getHeight()/2; // which row in the bitmap to analyze to read
                 bmp.getPixels(pixels, 0, bmp.getWidth(), 0, startY, bmp.getWidth(), 1);
 
                 int sum_mr = 0; // the sum of the mass times the radius
@@ -385,9 +390,12 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
                 }
 
                 int pos = cent;
-                canvas.drawCircle(pos, j, 5, paint1); // x position, y position, diameter, color
+                canvas.drawCircle(pos, startY, 5, paint1); // x position, y position, diameter, color
 
-            }
+            //}
+
+
+            /*
 
             counter = 0;
 
@@ -450,6 +458,34 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
             myTextView4.setText("PWMleft is: "+ PWMleft);
             myTextView5.setText("PWMright is: "+ PWMright);
 
+            */
+
+
+            int error;
+
+
+            error = cent - 240; // 240 means the dot is in the middle of the screen
+            if (error<0) { // slow down the left motor to steer to the left
+                error  = -error;
+                left = MAX_DUTY - (gain*4*error/100);
+                right = MAX_DUTY + (gain*4*error/100);
+                if (left < 0){
+                    left = 0;
+                }
+            }
+            else { // slow down the right motor to steer to the right
+                right = MAX_DUTY - (gain*4*error/100);
+                left = MAX_DUTY + (gain*4*error/100);
+                if (right<0) {
+                    right = 0;
+                }
+            }
+
+            PWMleft = left;
+            PWMright = right;
+
+            myTextView4.setText("PWMleft is: "+ PWMleft);
+            myTextView5.setText("PWMright is: "+ PWMright);
 
             String sendString = Integer.toString(PWMright) + " " + Integer.toString(PWMleft) + '\n';
             try {
